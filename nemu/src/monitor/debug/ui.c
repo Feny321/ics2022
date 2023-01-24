@@ -81,7 +81,7 @@ static int cmd_x(char *args){
   printf("%x\n" , addr_begin);
   for(int i = 0 ; i < N ; i++){
     printf("0x%x\n"  , paddr_read(addr_begin , 4));
-    addr_begin += addr_begin;
+    addr_begin += 4;
   }
   return 0;
 }
