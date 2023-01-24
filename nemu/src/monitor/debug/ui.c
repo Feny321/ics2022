@@ -1,10 +1,13 @@
 #include <isa.h>
 #include "expr.h"
 #include "watchpoint.h"
+#include "memory/paddr.h"
 
 #include <stdlib.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+
+
 
 void cpu_exec(uint64_t);
 int is_batch_mode();
@@ -69,9 +72,18 @@ static int cmd_info(char *args){
   return 0;
 }
 
-// static int cmd_x(char *args){
-
-// }
+static int cmd_x(char *args){
+  char *arg_1 = strtok(NULL , " ");
+  int N = atoi(arg_1);
+  char *arg_2 = strtok(NULL , " ");
+  uint32_t addr_begin;
+  sscanf(arg_2 , "%x" , &addr_begin);
+  printf("%x" , addr_begin);
+  for(int i = 0 ; i < N ; i++){
+    printf("0x%x\n"  , paddr_read(addr_begin , 4));
+  }
+  return 0;
+}
 
 static struct {
   char *name;
@@ -83,7 +95,7 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
   { "si" , "Execute N steps" , cmd_si},
   { "info" , "Print system state" , cmd_info},
-  //{ "x" , "Print N bytes memory value" , cmd_x},
+  { "x" , "Print N bytes memory value" , cmd_x},
   /* TODO: Add more commands */
 
 };
