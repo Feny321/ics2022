@@ -76,11 +76,12 @@ static int cmd_x(char *args){
   char *arg_1 = strtok(NULL , " ");
   int N = atoi(arg_1);
   char *arg_2 = strtok(NULL , " ");
-  uint32_t addr_begin;
+  paddr_t addr_begin;
   sscanf(arg_2 , "%x" , &addr_begin);
-  printf("%x" , addr_begin);
+  printf("%x\n" , addr_begin);
   for(int i = 0 ; i < N ; i++){
     printf("0x%x\n"  , paddr_read(addr_begin , 4));
+    addr_begin += addr_begin;
   }
   return 0;
 }
