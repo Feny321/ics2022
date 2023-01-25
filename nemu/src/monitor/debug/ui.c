@@ -89,7 +89,7 @@ static int cmd_x(char *args){
 static int cmd_p(char *args){
   char *arg_1 = strtok(NULL , " ");
   bool *success = false;
-  expr(arg_1 , success);
+  printf("Expression value is %d\n" , expr(arg_1 , success));
   return 0;
 }
 
