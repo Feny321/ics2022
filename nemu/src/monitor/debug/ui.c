@@ -80,11 +80,18 @@ static int cmd_x(char *args){
   sscanf(arg_2 , "%x" , &addr_begin);
   printf("%x\n" , addr_begin);
   for(int i = 0 ; i < N ; i++){
-    printf("0x%x\n"  , paddr_read(addr_begin , 4));
+    printf("0x80%x\n"  , paddr_read(addr_begin , 4));
     addr_begin += 4;
   }
   return 0;
 }
+
+// 0x1234b8
+// 0x27b900
+// 0x1890010
+// 0x441c766
+// 0x2bb0001
+// 0x66000000
 
 static struct {
   char *name;
