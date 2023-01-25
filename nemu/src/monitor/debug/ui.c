@@ -86,6 +86,13 @@ static int cmd_x(char *args){
   return 0;
 }
 
+static int cmd_p(char *args){
+  char *arg_1 = strtok(NULL , " ");
+  bool *success = false;
+  expr(arg_1 , success);
+  return 0;
+}
+
 // 0x1234b8
 // 0x27b900
 // 0x1890010
@@ -104,6 +111,7 @@ static struct {
   { "si" , "Execute N steps" , cmd_si},
   { "info" , "Print system state" , cmd_info},
   { "x" , "Print N bytes memory value" , cmd_x},
+  { "p" , "Expression infer value." , cmd_p}
   /* TODO: Add more commands */
 
 };
