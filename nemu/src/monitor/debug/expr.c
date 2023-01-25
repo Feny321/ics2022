@@ -128,6 +128,7 @@ static bool make_token(char *e) {
   }
 
     assert(nr_token > 0);
+    printf("token size is %d\n" , nr_token);
     if(tokens[0].type == '-'){
       tokens[0].type = TK_MINUS;
     }else if(tokens[0].type == '*'){
@@ -315,7 +316,7 @@ word_t expr(char *e, bool *success) {
     *success = false;
     return 0;
   }else{
-    return eval(0 , nr_token);
+    return eval(0 , nr_token-1);
   }
 
   return 0;
