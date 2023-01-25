@@ -88,7 +88,7 @@ static bool make_token(char *e) {
   while (e[position] != '\0') {
     /* Try all rules one by one. */
     for (i = 0; i < NR_REGEX; i ++) {
-      if (regexec(&re[i], e + position, 1, &pmatch, 0) == 0) {
+      if (regexec(&re[i], e + position, 1, &pmatch, 0) == 0 && pmatch.rm_so == 0) {
         char *substr_start = e + position;
         int substr_len = pmatch.rm_eo;
 
@@ -105,13 +105,13 @@ static bool make_token(char *e) {
         switch (rules[i].token_type) {
           case TK_NUM:
             strncpy(tokens[nr_token].str , substr_start , substr_len);
-            printf("tokens[%d]_str=%s\n" , nr_token , tokens[nr_token].str);continue;
+            printf("tokens[%d]_str=%s\n" , nr_token , tokens[nr_token].str);break;
           case TK_HEX:
             strncpy(tokens[nr_token].str , substr_start , substr_len);
-            printf("tokens[%d]_str=%s\n" , nr_token , tokens[nr_token].str);continue;
+            printf("tokens[%d]_str=%s\n" , nr_token , tokens[nr_token].str);break;
           case TK_REG:
             strncpy(tokens[nr_token].str , substr_start , substr_len);
-            printf("tokens[%d]_str=%s\n" , nr_token , tokens[nr_token].str);continue;
+            printf("tokens[%d]_str=%s\n" , nr_token , tokens[nr_token].str);break;
           case '+': strncpy(tokens[nr_token].str , substr_start , substr_len);
           default: continue;
         }
