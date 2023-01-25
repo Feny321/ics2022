@@ -105,13 +105,13 @@ static bool make_token(char *e) {
         switch (rules[i].token_type) {
           case TK_NUM:
             strncpy(tokens[nr_token].str , substr_start , substr_len);
-            printf("tokens[%d]_str%s\n" , nr_token , tokens[nr_token].str);
+            printf("tokens[%d]_str%s\n" , nr_token , tokens[nr_token].str);break;
           case TK_HEX:
             strncpy(tokens[nr_token].str , substr_start , substr_len);
-            printf("tokens[%d]_str%s\n" , nr_token , tokens[nr_token].str);
+            printf("tokens[%d]_str%s\n" , nr_token , tokens[nr_token].str);break;
           case TK_REG:
             strncpy(tokens[nr_token].str , substr_start , substr_len);
-            printf("tokens[%d]_str%s\n" , nr_token , tokens[nr_token].str);
+            printf("tokens[%d]_str%s\n" , nr_token , tokens[nr_token].str);break;
           default: continue;
         }
         //printf("tokens[%d]_str%s\n" , nr_token , tokens[nr_token].str);
