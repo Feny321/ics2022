@@ -89,7 +89,13 @@ static int cmd_x(char *args){
 static int cmd_p(char *args){
   char *arg_1 = strtok(NULL , " ");
   bool *success = false;
-  printf("Expression value is %d\n" , expr(arg_1 , success));
+  int ans = expr(arg_1 , success);
+  if(ans == 0){
+    printf("Expression fail!\n");
+  }else{
+    printf("Expression value is %d\n" , ans);
+  }
+  
   return 0;
 }
 
