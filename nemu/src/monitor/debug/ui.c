@@ -96,7 +96,7 @@ static int cmd_p(char *args){
     printf("Expression value is %d\n" , ans);
   }
   
-  return 0;
+  return ans;
 }
 
 // 0x1234b8
