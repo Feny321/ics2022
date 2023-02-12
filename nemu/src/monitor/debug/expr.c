@@ -39,11 +39,11 @@ static struct rule {
   {"\\-", '-'},
   {"\\*" , '*'},
   {"\\/" , '/'},
-  {"[0-9]*" , TK_NUM},
+  {"[0-9]+" , TK_NUM},
   {"\\(" , '('},
   {"\\)" , ')'},
   {"\\$[a-z]{2,3}" , TK_REG},
-  {"0x[0-9,a-f]{8}" , TK_HEX},
+  {"0x[0-9a-f]+" , TK_HEX},
   {"&&", TK_AND},
   {"\\|\\|", TK_OR},
   {"!=" ,TK_NEQ}
@@ -239,7 +239,6 @@ int eval(int p , int q){
 
 bool check_parenthesis(int p , int q){
   int i , nums = 0;
-
   for(i = p ; i < q ; i++){
     if(tokens[i].type == '('){
       nums++;
@@ -247,9 +246,7 @@ bool check_parenthesis(int p , int q){
     if(tokens[i].type == ')'){
       nums--;
     }
-    if(nums == 0 && i < q){
-      return false;
-    }
+    if(nums < 0) return false;
   }
   return true;
 }
