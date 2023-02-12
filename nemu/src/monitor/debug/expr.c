@@ -313,10 +313,11 @@ word_t expr(char *e, bool *success) {
     *success = false;
     return 0;
   }
-
+  printf("make token successful !\n");
   /* TODO: Insert codes to evaluate the expression. */
   if(!check_parenthesis(0 , nr_token)){
     *success = false;
+    printf("check parenthesis false!\n");
     return 0;
   }else{
     printf("check parentthesis true ! \n");
