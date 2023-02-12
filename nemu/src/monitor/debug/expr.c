@@ -3,6 +3,7 @@
 /* We use the POSIX regex functions to process regular expressions.
  * Type 'man regex' for more information about POSIX regex functions.
  */
+#include <memory/paddr.h>
 #include <regex.h>
 #include <stdlib.h>
 #include "../../isa/x86/local-include/reg.h"
@@ -103,6 +104,12 @@ static bool make_token(char *e) {
          */
         tokens[nr_token].type = rules[i].token_type;
         switch (rules[i].token_type) {
+          case '+':
+          case '-':
+          case '*':
+          case '/':
+          case '(':
+          case ')': break;
           case TK_NUM:
             strncpy(tokens[nr_token].str , substr_start , substr_len);
             printf("tokens[%d]_str=%s\n" , nr_token , tokens[nr_token].str);break;
@@ -112,10 +119,7 @@ static bool make_token(char *e) {
           case TK_REG:
             strncpy(tokens[nr_token].str , substr_start , substr_len);
             printf("tokens[%d]_str=%s\n" , nr_token , tokens[nr_token].str);break;
-          case '+': 
-            strncpy(tokens[nr_token].str , substr_start , substr_len);
-            printf("tokens[%d]_str=%s\n" , nr_token , tokens[nr_token].str);break;
-          default: continue;
+          default: break;
         }
         //printf("tokens[%d]_str%s\n" , nr_token , tokens[nr_token].str);
         nr_token++;
@@ -151,103 +155,64 @@ static bool make_token(char *e) {
 
 
 int eval(int p , int q){
-  Token *begin = tokens + p;
-  Token *end = tokens + q;
-  printf("tokens begin: %p;\tend:%p;\t%ld\n" , begin , end , end - begin +1);
-
-  for(int i = 0 ; i < q - p + 1 ; i++){
-    printf("%d\t" , tokens[p+i].type);
-  }
-  printf("\n");
-
   if(p > q){
     printf("Bad expression.\n");
     assert(0);
-  }
-
-  if(tokens[p].type == TK_NOTYPE){
-    return eval(p+1 , q);
-  }else if(tokens[q].type == TK_NOTYPE){
-    return eval(p , q-1);
   }else if(p == q){
-    if(tokens[p].type == TK_NUM){
-      return atoi(tokens[p].str);
-    }else if(tokens[p].type == TK_REG){
-      //eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi"};
-      if      (strcmp(tokens[p].str, "$eax") == 0)  return cpu.eax;
-      else if (strcmp(tokens[p].str, "$ebx") == 0)  return cpu.ebx;
-      else if (strcmp(tokens[p].str, "$ecx") == 0)  return cpu.ecx;
-      else if (strcmp(tokens[p].str, "$edx") == 0)  return cpu.edx;
-      else if (strcmp(tokens[p].str, "$ebp") == 0)  return cpu.ebp;
-      else if (strcmp(tokens[p].str, "$esp") == 0)  return cpu.esp;
-      else if (strcmp(tokens[p].str, "$esi") == 0)  return cpu.esi;
-      else if (strcmp(tokens[p].str, "$edi") == 0)  return cpu.edi;
-      //else if (strcmp(tokens[p].str, "$eip") == 0)  return cpu.eip;
-      else if (strcmp(tokens[p].str, "$ah") == 0)  return reg_b(R_AH);
-      else if (strcmp(tokens[p].str, "$al") == 0)  return reg_b(R_AL);
-      else if (strcmp(tokens[p].str, "$bh") == 0)  return reg_b(R_BH);
-      else if (strcmp(tokens[p].str, "$bl") == 0)  return reg_b(R_AH);
-      else if (strcmp(tokens[p].str, "$ch") == 0)  return reg_b(R_CH);
-      else if (strcmp(tokens[p].str, "$cl") == 0)  return reg_b(R_CL);
-      else if (strcmp(tokens[p].str, "$dh") == 0)  return reg_b(R_DH);
-      else if (strcmp(tokens[p].str, "$dl") == 0)  return reg_b(R_DL);
-      else if (strcmp(tokens[p].str, "$ax") == 0)  return reg_w(R_AX);
-      else if (strcmp(tokens[p].str, "$bx") == 0)  return reg_w(R_BX);
-      else if (strcmp(tokens[p].str, "$cx") == 0)  return reg_w(R_CX);
-      else if (strcmp(tokens[p].str, "$dx") == 0)  return reg_w(R_DX);
-      else if (strcmp(tokens[p].str, "$sp") == 0)  return reg_w(R_SP);
-      else if (strcmp(tokens[p].str, "$bp") == 0)  return reg_w(R_BP);
-      else  assert(0);
-    }else if(tokens[p].type == TK_HEX){
-      int cnt , i , len , sum = 0;
-      len = strlen(tokens[p].str);
-      cnt = 1;
-      for(i = len - 1 ; i >= 0 ; i--){
-        sum = sum + cnt * get_num(tokens[p].str[i]);
-        cnt *= 16;
-      }
-      return sum;
-    }else if(check_parenthesis(p , q)){
-      return eval(p + 1 , q - 1);
-    }else{
-      int op = find_dominant_operator(p , q);
-      if(op == -1){
-        if(tokens[p].type == TK_MINUS){
-          return -eval(p+1,q);
-        }else if(tokens[p].type == TK_DER){
-          return vaddr_read(eval(p+1 , q),4);
-        }
-      }
-      uint32_t val1 = eval(p , op - 1);
-      uint32_t val2 = eval(op + 1 , q);
+    bool flag = false;
+    int res;
+    switch (tokens[p].type)
+    {
+      case TK_NUM: return atoi(tokens[p].str);
+      case TK_HEX: sscanf(tokens[p].str , "%x" , &res); return res;
+      case TK_REG: return isa_reg_str2val(tokens[p].str , &flag);
+    }
+  }else if(check_parenthesis(p,q) == true){
+    return eval(p+1 , q-1);
+  }else{
+    int op;
+    op = find_dominant_operator(p , q);
+    if(op == -1) assert(0);
 
-      switch(tokens[op].type){
-        case '+' : return val1 + val2;
-        case '-' : return val1 - val2;
-        case '*' : return val1 * val2;
-        case '/' : return val1 / val2;
-        case TK_AND: return val1 && val2;
-        case TK_OR: return val1 || val2;
-        case TK_EQ: return val1 == val2;
-        case TK_NEQ: return val1 != val2;
-        default : assert(0);
-      }
+    if(tokens[op].type == TK_MINUS){
+      return eval(op+1 , q)*(-1);
+    }
+    if(tokens[op].type == TK_DER){
+      return paddr_read(eval(op+1 , q) , 4);
+    }
+    // if(tokens[op].type == '!'){
+    //   return !eval(op+1 , q);
+    // }
+
+    word_t val1 = eval(p , op-1);
+    word_t val2 = eval(op+1 , q);
+    if(tokens[op].type == '/' && val2 == 0) assert(0);
+    switch (tokens[op].type)
+    {
+      case '+': return val1 + val2;
+      case '-': return val1 - val2;
+      case '*': return val1 * val2;
+      case '/': return val1/val2;
+      
+      default:break;
     }
   }
-  return 1;
+  return 0;
 }
 
 bool check_parenthesis(int p , int q){
   int i , nums = 0;
-  for(i = p ; i < q ; i++){
+  if(tokens[p].type != '(' || tokens[q].type != ')') return false;
+  for(i = p ; i <= q ; i++){
     if(tokens[i].type == '('){
       nums++;
     }
     if(tokens[i].type == ')'){
       nums--;
     }
-    if(nums < 0) return false;
+    if(nums == 0 && i < q) return false;
   }
+  if(nums != 0) return false;
   return true;
 }
 
@@ -310,15 +275,11 @@ word_t expr(char *e, bool *success) {
     *success = false;
     return 0;
   }
-  printf("make token successful !\n");
+  
   /* TODO: Insert codes to evaluate the expression. */
-  if(!check_parenthesis(0 , nr_token)){
-    *success = false;
-    printf("check parenthesis false!\n");
-    return 0;
-  }else{
-    printf("check parentthesis true ! \n");
-    return eval(0 , nr_token-1);
-  }
+  
+   
+  printf("%d\n" , eval(0 , nr_token-1));
+  
   return 0;
 }
