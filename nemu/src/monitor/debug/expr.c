@@ -87,7 +87,7 @@ static bool make_token(char *e) {
 
   while (e[position] != '\0') {
     /* Try all rules one by one. */
-    for (i = 0; i < NR_REGEX; i ++) {
+    for (i = 0; i < NR_REGEX; i++) {
       if (regexec(&re[i], e + position, 1, &pmatch, 0) == 0 && pmatch.rm_so == 0) {
         char *substr_start = e + position;
         int substr_len = pmatch.rm_eo;
@@ -153,7 +153,7 @@ static bool make_token(char *e) {
 int eval(int p , int q){
   Token *begin = tokens + p;
   Token *end = tokens + q;
-  printf("tokens begin:%p;\tend:%p;\t%ld\n" , begin , end , end - begin +1);
+  printf("tokens begin: %p;\tend:%p;\t%ld\n" , begin , end , end - begin +1);
 
   for(int i = 0 ; i < q - p + 1 ; i++){
     printf("%d\t" , tokens[p+i].type);
@@ -320,6 +320,5 @@ word_t expr(char *e, bool *success) {
     printf("check parentthesis true ! \n");
     return eval(0 , nr_token-1);
   }
-
   return 0;
 }
