@@ -129,21 +129,22 @@ static bool make_token(char *e) {
     }
   }
 
-    assert(nr_token > 0);
-    printf("token size is %d\n" , nr_token);
-    if(tokens[0].type == '-'){
-      tokens[0].type = TK_MINUS;
-    }else if(tokens[0].type == '*'){
-      tokens[0].type = TK_DER;
-    }
+  assert(nr_token > 0);
+  printf("token size is %d\n" , nr_token);
+  // if(tokens[0].type == '-'){
+  //   tokens[0].type = TK_MINUS;
+  // }else if(tokens[0].type == '*'){
+  //   tokens[0].type = TK_DER;
+  // }
 
-    for(int j = 1 ; j < nr_token ; j++){
-      if(tokens[j].type == '-' && tokens[j-1].type != ')' && (tokens[j-1].type > TK_REG || tokens[j-1].type < TK_HEX)){
-        tokens[j].type = TK_MINUS;
-      }else if(tokens[j].type == '*' && tokens[j-1].type != ')' && (tokens[j-1].type > TK_REG || tokens[j-1].type < TK_HEX)){
-        tokens[j].type = TK_DER;
-      }
-    }
+  // for(int j = 1 ; j < nr_token ; j++){
+  //   //TK_NOTYPE = 256, TK_EQ , TK_HEX, TK_NUM ,TK_REG, TK_AND, TK_OR, TK_NEQ, TK_MINUS, TK_DER 
+  //   if(tokens[j].type == '-' && tokens[j-1].type != ')' && (tokens[j-1].type > TK_REG || tokens[j-1].type < TK_HEX)){
+  //     tokens[j].type = TK_MINUS;
+  //   }else if(tokens[j].type == '*' && tokens[j-1].type != ')' && (tokens[j-1].type > TK_REG || tokens[j-1].type < TK_HEX)){
+  //     tokens[j].type = TK_DER;
+  //   }
+  // }
   return true;
 }
 
@@ -239,7 +240,7 @@ int eval(int p , int q){
 bool check_parenthesis(int p , int q){
   int i , nums = 0;
 
-  for(i = p ; i <= q ; i++){
+  for(i = p ; i < q ; i++){
     if(tokens[i].type == '('){
       nums++;
     }
