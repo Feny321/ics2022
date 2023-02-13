@@ -21,7 +21,16 @@ uint32_t get_num(char str);
 //TK_MINUS 
 //TK_DER memory address
 enum {
-  TK_NOTYPE = 256, TK_EQ , TK_HEX, TK_NUM ,TK_REG, TK_AND, TK_OR, TK_NEQ, TK_MINUS, TK_DER 
+  TK_NOTYPE = 256, 
+  TK_EQ ,
+  TK_HEX, 
+  TK_NUM ,
+  TK_REG, 
+  TK_AND, 
+  TK_OR, 
+  TK_NEQ, 
+  TK_MINUS, 
+  TK_DER 
   /* TODO: Add more token types */
 };
 
@@ -40,11 +49,13 @@ static struct rule {
   {"\\-", '-'},
   {"\\*" , '*'},
   {"\\/" , '/'},
+
   {"[0-9]+" , TK_NUM},
   {"\\(" , '('},
   {"\\)" , ')'},
   {"\\$[a-z]{2,3}" , TK_REG},
   {"0x[0-9a-f]+" , TK_HEX},
+
   {"&&", TK_AND},
   {"\\|\\|", TK_OR},
   {"!=" ,TK_NEQ}
@@ -135,20 +146,16 @@ static bool make_token(char *e) {
 
   assert(nr_token > 0);
   printf("token size is %d\n" , nr_token);
-  // if(tokens[0].type == '-'){
-  //   tokens[0].type = TK_MINUS;
-  // }else if(tokens[0].type == '*'){
-  //   tokens[0].type = TK_DER;
-  // }
+  
+  for (i = 0; i < nr_token; i++) {
+		if (tokens[i].type == '-' && (i == 0 || (tokens[i-1].type != ')' && tokens[i-1].type != TK_NUM && tokens[i-1].type != TK_HEX && tokens[i-1].type != TK_REG))) {
+			tokens[i].type = TK_MINUS;
+		}
 
-  // for(int j = 1 ; j < nr_token ; j++){
-  //   //TK_NOTYPE = 256, TK_EQ , TK_HEX, TK_NUM ,TK_REG, TK_AND, TK_OR, TK_NEQ, TK_MINUS, TK_DER 
-  //   if(tokens[j].type == '-' && tokens[j-1].type != ')' && (tokens[j-1].type > TK_REG || tokens[j-1].type < TK_HEX)){
-  //     tokens[j].type = TK_MINUS;
-  //   }else if(tokens[j].type == '*' && tokens[j-1].type != ')' && (tokens[j-1].type > TK_REG || tokens[j-1].type < TK_HEX)){
-  //     tokens[j].type = TK_DER;
-  //   }
-  // }
+		if (tokens[i].type == '*' && (i == 0 || (tokens[i-1].type != ')' && tokens[i-1].type != TK_NUM && tokens[i-1].type != TK_HEX && tokens[i-1].type != TK_REG))) {
+			tokens[i].type = TK_DER;
+		}
+	}
   return true;
 }
 

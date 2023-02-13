@@ -68,23 +68,23 @@ void isa_reg_display() {
   
   printf("%%ebp: 0x%-12x",cpu.ebp);
   printf("%%bp: 0x%-12x",cpu.ebp & 0xffff);
-  printf("%%bph: 0x%-11x",(cpu.ebp >> 8) & 0xff);
-  printf("%%bpl: 0x%-11x\n",cpu.ebp & 0xff);
+  // printf("%%bph: 0x%-11x",(cpu.ebp >> 8) & 0xff);
+  // printf("%%bpl: 0x%-11x\n",cpu.ebp & 0xff);
   
   printf("%%esi: 0x%-12x",cpu.esi);
   printf("%%si: 0x%-12x",cpu.esi & 0xffff);
-  printf("%%sih: 0x%-11x",(cpu.esi >> 8) & 0xff);
-  printf("%%sil: 0x%-11x\n",cpu.esi & 0xff);
+  // printf("%%sih: 0x%-11x",(cpu.esi >> 8) & 0xff);
+  // printf("%%sil: 0x%-11x\n",cpu.esi & 0xff);
   
   printf("%%edi: 0x%-12x",cpu.edi);
   printf("%%di: 0x%-12x",cpu.edi & 0xffff);
-  printf("%%dih: 0x%-11x",(cpu.edi >> 8) & 0xff);
-  printf("%%dil: 0x%-11x\n",cpu.edi & 0xff);
+  // printf("%%dih: 0x%-11x",(cpu.edi >> 8) & 0xff);
+  // printf("%%dil: 0x%-11x\n",cpu.edi & 0xff);
   
   printf("%%esp: 0x%-12x",cpu.esp);
   printf("%%sp: 0x%-12x",cpu.esp & 0xffff);
-  printf("%%sph: 0x%-11x",(cpu.esp >> 8) & 0xff);
-  printf("%%spl: 0x%-11x\n",cpu.esp & 0xff);
+  // printf("%%sph: 0x%-11x",(cpu.esp >> 8) & 0xff);
+  // printf("%%spl: 0x%-11x\n",cpu.esp & 0xff);
 }
 
 word_t isa_reg_str2val(const char *s, bool *success) {
