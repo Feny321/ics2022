@@ -30,7 +30,13 @@ enum {
   TK_OR, 
   TK_NEQ, 
   TK_MINUS, 
-  TK_DER 
+  TK_DER,
+  TK_LE,
+  TK_BE,
+  TK_LESS,
+  TK_BIGGER,
+  TK_LM,
+  TK_RM
   /* TODO: Add more token types */
 };
 
@@ -46,6 +52,7 @@ static struct rule {
   {" +", TK_NOTYPE},    // spaces
   {"\\+", '+'},         // plus
   {"==", TK_EQ},        // equal
+   {"!=" ,TK_NEQ},
   {"\\-", '-'},
   {"\\*" , '*'},
   {"\\/" , '/'},
@@ -58,7 +65,14 @@ static struct rule {
 
   {"&&", TK_AND},
   {"\\|\\|", TK_OR},
-  {"!=" ,TK_NEQ}
+  {"!" , '!'},
+  {"<=",TK_LE},     //less equal
+  {">=" , TK_BE},   //bigger equal
+  {"<" , TK_LESS},  //less
+  {">" , TK_BIGGER},//bigger
+  {"<<" , TK_LM} ,  //left move
+  {">>" , TK_RM}    //right move
+ 
 };
 
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
@@ -123,13 +137,13 @@ static bool make_token(char *e) {
           case ')': break;
           case TK_NUM:
             strncpy(tokens[nr_token].str , substr_start , substr_len);
-            printf("tokens[%d]_str=%s\n" , nr_token , tokens[nr_token].str);break;
+            //printf("tokens[%d]_str=%s\n" , nr_token , tokens[nr_token].str);break;
           case TK_HEX:
             strncpy(tokens[nr_token].str , substr_start , substr_len);
-            printf("tokens[%d]_str=%s\n" , nr_token , tokens[nr_token].str);break;
+            //printf("tokens[%d]_str=%s\n" , nr_token , tokens[nr_token].str);break;
           case TK_REG:
             strncpy(tokens[nr_token].str , substr_start , substr_len);
-            printf("tokens[%d]_str=%s\n" , nr_token , tokens[nr_token].str);break;
+            //printf("tokens[%d]_str=%s\n" , nr_token , tokens[nr_token].str);break;
           default: break;
         }
         //printf("tokens[%d]_str%s\n" , nr_token , tokens[nr_token].str);
@@ -148,11 +162,13 @@ static bool make_token(char *e) {
   printf("token size is %d\n" , nr_token);
   
   for (i = 0; i < nr_token; i++) {
-		if (tokens[i].type == '-' && (i == 0 || (tokens[i-1].type != ')' && tokens[i-1].type != TK_NUM && tokens[i-1].type != TK_HEX && tokens[i-1].type != TK_REG))) {
+		if (tokens[i].type == '-' && (i == 0 || 
+    (tokens[i-1].type != ')' && tokens[i-1].type != TK_NUM && tokens[i-1].type != TK_HEX && tokens[i-1].type != TK_REG))) {
 			tokens[i].type = TK_MINUS;
 		}
 
-		if (tokens[i].type == '*' && (i == 0 || (tokens[i-1].type != ')' && tokens[i-1].type != TK_NUM && tokens[i-1].type != TK_HEX && tokens[i-1].type != TK_REG))) {
+		if (tokens[i].type == '*' && (i == 0 || 
+    (tokens[i-1].type != ')' && tokens[i-1].type != TK_NUM && tokens[i-1].type != TK_HEX && tokens[i-1].type != TK_REG))) {
 			tokens[i].type = TK_DER;
 		}
 	}
@@ -187,9 +203,9 @@ int eval(int p , int q){
     if(tokens[op].type == TK_DER){
       return paddr_read(eval(op+1 , q) , 4);
     }
-    // if(tokens[op].type == '!'){
-    //   return !eval(op+1 , q);
-    // }
+    if(tokens[op].type == '!'){
+      return !eval(op+1 , q);
+    }
 
     word_t val1 = eval(p , op-1);
     word_t val2 = eval(op+1 , q);
@@ -200,8 +216,17 @@ int eval(int p , int q){
       case '-': return val1 - val2;
       case '*': return val1 * val2;
       case '/': return val1/val2;
-      
-      default:break;
+      case TK_AND: return val1 && val2;
+      case TK_OR: return val1 || val2;
+      case TK_EQ: return val1 == val2;
+      case TK_NOTYPE: return val1 != val2;
+      case TK_LM: return (val1 << val2);
+      case TK_RM: return (val1 >> val2);
+      case TK_LESS: return val1 < val2;
+      case TK_BIGGER: return val1 > val2;
+      case TK_LE: return val1 <= val2;
+      case TK_BE: return val1 >= val2;
+      default: assert(0);
     }
   }
   return 0;
@@ -224,23 +249,16 @@ bool check_parenthesis(int p , int q){
 }
 
 int find_dominant_operator(int p , int q){
-  int i , nums = 0 , now_priority = 6 , now_position = -1;
+  int i , nums = 0, now_position = -1;
   for(i = p ; i <= q ; i++){
     if(tokens[i].type == '('){
       nums++;
-      continue;
     }else if(tokens[i].type == ')'){
       nums--;
-      continue;
-    }else if(nums > 0){
-      continue;
-    }else if(priority(tokens[i].type) == 0){
-      continue;
-    }else if(priority(tokens[i].type) <= now_priority){
+    }else if(priority(tokens[i].type) <= tokens[now_position].type && nums == 0){
       now_position = i;
-      now_priority = priority(tokens[i].type);
     }else{
-      
+      continue;
     }
   }
   return now_position;
@@ -249,20 +267,16 @@ int find_dominant_operator(int p , int q){
 int priority(int type){
   switch (type)
   {
-    case TK_NUM:
-    case TK_REG:
-    case TK_HEX:
-    case TK_DER:return 0;
-    case TK_OR:return 1;
-    case TK_AND:return 2;
-    case TK_EQ:
-    case TK_NEQ: return 3;
-    case '+':
-    case '-':return 4;
-    case '*':
-    case '/': return 5;
-    default : assert(0);
+    case TK_MINUS: case TK_DER: return 8;
+    case '*': case '/': return 7;
+    case '+': case '-': return 6;
+    case TK_LM: case TK_RM: return 5;
+    case TK_LE: case TK_BE: case TK_LESS: case TK_BIGGER: return 4;
+    case TK_NOTYPE: case TK_EQ: return 3;
+    case TK_AND: return 2;
+    case TK_OR: return 1;
   }
+  return 0;
 }
 
 uint32_t get_num(char str){
