@@ -224,7 +224,7 @@ bool check_parenthesis(int p , int q){
 }
 
 int find_dominant_operator(int p , int q){
-  int i , nums = 0 , now_priority = 0 , now_position = -1;
+  int i , nums = 0 , now_priority = 6 , now_position = -1;
   for(i = p ; i <= q ; i++){
     if(tokens[i].type == '('){
       nums++;
@@ -236,7 +236,7 @@ int find_dominant_operator(int p , int q){
       continue;
     }else if(priority(tokens[i].type) == 0){
       continue;
-    }else if(priority(tokens[i].type) >= now_priority){
+    }else if(priority(tokens[i].type) <= now_priority){
       now_position = i;
       now_priority = priority(tokens[i].type);
     }else{
