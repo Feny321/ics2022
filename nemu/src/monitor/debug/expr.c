@@ -276,7 +276,7 @@ int priority(int type){
     case TK_AND: return 2;
     case TK_OR: return 1;
   }
-  return 0;
+  return 20;
 }
 
 uint32_t get_num(char str){
@@ -301,6 +301,4 @@ word_t expr(char *e, bool *success) {
   
    
   return eval(0 , nr_token-1);
-  
-  
 }
