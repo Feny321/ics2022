@@ -255,7 +255,7 @@ int find_dominant_operator(int p , int q){
       nums++;
     }else if(tokens[i].type == ')'){
       nums--;
-    }else if(priority(tokens[i].type) <= tokens[now_position].type && nums == 0){
+    }else if(priority(tokens[i].type) <= priority(tokens[now_position].type) && nums == 0){
       now_position = i;
     }else{
       continue;
