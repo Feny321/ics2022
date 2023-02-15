@@ -3,9 +3,9 @@
 #include <time.h>
 #include "local-include/reg.h"
 
-const char *regsl[] = {"$eax", "$ecx", "edx", "ebx", "esp", "ebp", "esi", "edi"};
-const char *regsw[] = {"ax", "cx", "dx", "bx", "sp", "bp", "si", "di"};
-const char *regsb[] = {"al", "cl", "dl", "bl", "ah", "ch", "dh", "bh"};
+const char *regsl[] = {"$eax", "$ecx", "$edx", "$ebx", "$esp", "$ebp", "$esi", "$edi"};
+const char *regsw[] = {"$ax", "$cx", "$dx", "$bx", "$sp", "$bp", "$si", "$di"};
+const char *regsb[] = {"$al", "$cl", "$dl", "$bl", "$ah", "$ch", "$dh", "$bh"};
 
 void reg_test() {
   srand(time(0));

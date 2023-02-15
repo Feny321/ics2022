@@ -65,7 +65,8 @@ static int cmd_info(char *args){
     case 'r':
       isa_reg_display();
       break;
-      
+    case 'w':
+      print_wp();
     default:
       return 0;
   }
@@ -95,8 +96,13 @@ static int cmd_p(char *args){
   }else{
     printf("Expression value is %d\n" , ans);
   }
-  
   return ans;
+}
+
+static int cmd_w(char *args){
+  WP *wp = new_wp(args);
+  Log("Successfully set a watchpoint %d , %s", wp->NO , wp->expr);
+  return 0;
 }
 
 // 0x1234b8
@@ -115,9 +121,10 @@ static struct {
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
   { "si" , "Execute N steps" , cmd_si},
-  { "info" , "Print system state" , cmd_info},
+  { "info" , "Print state of registers or information of watchpoints" , cmd_info},
   { "x" , "Print N bytes memory value" , cmd_x},
-  { "p" , "Expression infer value." , cmd_p}
+  { "p" , "Expression infer value." , cmd_p},
+  { "w" , "Set a watchpoint" , cmd_w}
   /* TODO: Add more commands */
 
 };
